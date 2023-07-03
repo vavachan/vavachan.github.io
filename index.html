@@ -1,87 +1,92 @@
 <!DOCTYPE html>
 
 <html>
-    <head>
-    <link rel="stylesheet" href="static/styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300&display=swap" rel="stylesheet">
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    </head>
 
-    <body>
-        <h1>
-            This is the personal webpage of Varghese Babu
-        </h1>
-    <p>
-        My name is Varghese Babu and I am a computational physicist. I did a BS-MS program in physics at 
-        <a href="https://www.niser.ac.in/" target="_blank">National Institute of Science Education and Research (NISER) </a>, Bhubaneswar, India from 2011-2016.
-        After that I did my PhD with <a href="http://old.jncasr.ac.in/sastry/" target="_blank"> Prof. Srikanth Sastry </a> at <a href="https://www.jncasr.ac.in/home" target="_blank"> Jawaharlal Nehru Center for Advanced Scientific 
-        Research (JNCASR) </a>, Bangalore, India in computational physics. During my PhD I worked on 
-        understanding the jamming transition in granular materials. I have an interest in everything 
-        computational. I love writing code, handling large amounts of data - collecting, analysing and visualizing them. 
-    </p>
-    <h1>
-        Research Activities
-    </h1>
-    <h2>
-        Brief summaries of my research activities
-    </h2>
-    <h3>
-        Study of jamming transition under shear
-    </h3>
-    <div class="research_summaries">
-        <div class="text">
 
-        The jamming transition is associated with what one normally associates with 
-        the word jamming - "traffic jams", or <a href="images/Granular_jamming.svg">clogging</a>.
-        In a jammed system no collective motion of particles is possible, this in turn 
-        implies that the system will resist all deformation. 
-        Jamming is typically studied in numerical simulations by subjecting repulsive sphere packings
-        to compression. Jamming can also occur when packings are subjected to shear deformation. 
-        My PhD thesis deals with this phenomena of shear jamming and the role of friction in it. 
-        </div>
-        <div class="image">
-            <img title="Image of shear jammed bi-disperse spheres " src="images/sphere-hires_glass.png"  style="width:auto;height:500px;">
-        </div>
-        <div class="image">
-            <img title="Animation of a set of disk packings under shear. The lines connect the centers of two particles, the darkness of the line shows how close the two particles are, with black lines showing that they are in touch. As the system is sheared, particles come close, till most of them become part of a contact network." src="images/optimized.gif"  style="width:auto;height:500px;">
-        </div>
-    </div>
-        <h3>
-            Rigidity transition and jamming
-        </h3>
-    <div class="research_summaries">
-        <div class="image"> 
-            <img title="Abrupt rigidity transition during shear jamming. Bonds of one color are part of the same rigid network. For the figure on the left, there is one bond less than how many required for ensuring rigidity and the system is composed of many small rigid cluster. Addition of one more bond makes the whole system into a single large rigid cluster." src="images/rigidity.svg" style="width:auto;height:500px;">
-        </div>
-        <div class="text">
-            A graph becomes rigid when the no vertex of the graph can be moved without changing the length of the 
-            edges in the graph. For \(D=2\), a graph with \(N\) vertices and \( N_c \) edges, one needs (at least) \(N_c=2 N -2 \) edges to 
-            constrain all degrees of freedom (2 translational degrees of freedom cannot be constrained in periodic system). However this is a necessary but not a sufficient condition for rigidity as the edges need to be used 
-            "judiciously" - a subgraph should not contain more edges than required to ensure rigidity. Previous work, on bond 
-            diluted graphs show that the system acquires rigidity continously, while the contact network of particles undergoing 
-            jamming shows an abrupt jump in the size of the rigid cluster at the isostatic point \( N_c = 2N -2\). Our results show that 
-            when the system is composed of repulsive disks, rigidity does come about abruptly and these systems naturally makes a 
-            judicious use of bonds. 
-        </div>
-    </div>
-        <h3>
-            Force Tile Network
-        </h3>
-    <div class="research_summaries">
-        <div class="text">
-           In a jammed configurations each particle is in force-balance - the net force acting on the particle is zero. If the was not zero then that particle is moving, which means that the system is not jammed. When the sum of forces acting on a 
-           particle is zero, the forces can be arranged in a way such that they form a closed loop. Therefore each particle has a corresponding force-tile. Now each 
-           force is shared between two particles, therefore the force-tiles of two particles 
-           has to share an edge. One can build the force-tile network for the whole jammed 
-           system this way. I had a lot of fun writing this code in python.  
-        </div>
-        <img src="images/FTN.png" style="width:auto;height:500px;" >
-    </div>
-        <h3>
-            Void space analysis 
-        </h3>
-    </body>
+	<head>
+		<link rel="stylesheet" href="static/styles.css">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300&display=swap" rel="stylesheet">
+		<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+		<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	</head>
+
+	<body>
+		<h1>
+			This is the personal webpage of Varghese Babu
+		</h1>
+		<p>
+		My name is Varghese Babu and I am a computational physicist. I did a BS-MS program in physics at 
+		<a href="https://www.niser.ac.in/" target="_blank">National Institute of Science Education and Research (NISER) </a>, Bhubaneswar, India from 2011-2016.
+		After that I did my PhD with <a href="http://old.jncasr.ac.in/sastry/" target="_blank"> Prof. Srikanth Sastry </a> at <a href="https://www.jncasr.ac.in/home" target="_blank"> Jawaharlal Nehru Center for Advanced Scientific 
+			Research (JNCASR) </a>, Bangalore, India in computational physics. During my PhD I worked on 
+		understanding the jamming transition in granular materials. I have an interest in everything 
+		computational. I love writing code, handling large amounts of data - collecting, analysing and visualizing them. 
+		<h1>
+			<a href="blogs/rnn.xhtml">Using character-level RNN to generate text in pytorch</a>
+		</h1>
+
+		</p>
+		<h1>
+			Research Activities
+		</h1>
+		<h2>
+			Brief summaries of my research activities
+		</h2>
+		<h3>
+			Study of jamming transition under shear
+		</h3>
+		<div class="research_summaries">
+			<div class="text">
+
+				The jamming transition is associated with what one normally associates with 
+				the word jamming - "traffic jams", or <a href="images/Granular_jamming.svg">clogging</a>.
+				In a jammed system no collective motion of particles is possible, this in turn 
+				implies that the system will resist all deformation. 
+				Jamming is typically studied in numerical simulations by subjecting repulsive sphere packings
+				to compression. Jamming can also occur when packings are subjected to shear deformation. 
+				My PhD thesis deals with this phenomena of shear jamming and the role of friction in it. 
+			</div>
+			<div class="image">
+				<img title="Image of shear jammed bi-disperse spheres " src="images/sphere-hires_glass.png"  style="width:auto;height:500px;">
+			</div>
+			<div class="image">
+				<img title="Animation of a set of disk packings under shear. The lines connect the centers of two particles, the darkness of the line shows how close the two particles are, with black lines showing that they are in touch. As the system is sheared, particles come close, till most of them become part of a contact network." src="images/optimized.gif"  style="width:auto;height:500px;">
+			</div>
+		</div>
+		<h3>
+			Rigidity transition and jamming
+		</h3>
+		<div class="research_summaries">
+			<div class="image"> 
+				<img title="Abrupt rigidity transition during shear jamming. Bonds of one color are part of the same rigid network. For the figure on the left, there is one bond less than how many required for ensuring rigidity and the system is composed of many small rigid cluster. Addition of one more bond makes the whole system into a single large rigid cluster." src="images/rigidity.svg" style="width:auto;height:500px;">
+			</div>
+			<div class="text">
+				A graph becomes rigid when the no vertex of the graph can be moved without changing the length of the 
+				edges in the graph. For \(D=2\), a graph with \(N\) vertices and \( N_c \) edges, one needs (at least) \(N_c=2 N -2 \) edges to 
+				constrain all degrees of freedom (2 translational degrees of freedom cannot be constrained in periodic system). However this is a necessary but not a sufficient condition for rigidity as the edges need to be used 
+				"judiciously" - a subgraph should not contain more edges than required to ensure rigidity. Previous work, on bond 
+				diluted graphs show that the system acquires rigidity continously, while the contact network of particles undergoing 
+				jamming shows an abrupt jump in the size of the rigid cluster at the isostatic point \( N_c = 2N -2\). Our results show that 
+				when the system is composed of repulsive disks, rigidity does come about abruptly and these systems naturally makes a 
+				judicious use of bonds. 
+			</div>
+		</div>
+		<h3>
+			Force Tile Network
+		</h3>
+		<div class="research_summaries">
+			<div class="text">
+				In a jammed configuration each particle is in force-balance i.e. the net force acting on the particle is zero. If this is not zero 
+				then that particle is moving, which means that the system is not jammed. When the sum of forces acting on a 
+				particle is zero, the forces can be arranged in a way such that they form a closed loop. Therefore each particle has a corresponding force-tile. Now each 
+				force is shared between two particles, therefore the force-tiles of two particles 
+				has to share an edge. One can build the force-tile network for the whole jammed 
+				system this way. I had a lot of fun writing this code in python.  
+			</div>
+			<img src="images/FTN.png" style="width:auto;height:500px;" >
+		</div>
+	</body>
 </html>

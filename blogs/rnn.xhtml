@@ -1,0 +1,1101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN" "http://www.w3.org/Math/DTD/mathml2/xhtml-math11-f.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="GENERATOR" content="LyX 2.3.7" />
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+<title>Text generation using character level RNN</title>
+<style type='text/css'>
+/* Layout-provided Styles */
+h1.title {
+font-size: x-large;
+margin-bottom: 1ex;
+text-align: center;
+
+}
+h2.section {
+font-weight: bold;
+font-size: x-large;
+margin-top: 1.3ex;
+margin-bottom: 0.7ex;
+text-align: left;
+
+}
+div.standard {
+	margin-bottom: 2ex;
+}
+div.lyx_code {
+font-family: monospace;
+margin-top: 0.5ex;
+margin-bottom: 0.5ex;
+margin-left: 3ex;
+margin-right: 3ex;
+text-align: left;
+
+}
+div.plain_layout {
+text-align: left;
+
+}
+div.float {
+	border: 2px solid black;
+	text-align: center;
+}
+div.float-listings {
+	border: 2px solid black;
+	padding: 1ex;
+	margin: 1ex;
+}
+div.listings-caption {
+	text-align: center;
+	border: 2px solid black;
+	padding: 1ex;
+	margin: 1ex;
+	}
+div.float-caption {
+	text-align: center;
+	border: 2px solid black;
+	padding: 1ex;
+	margin: 1ex;
+}
+
+
+</style>
+</head>
+<body dir="auto">
+<h1 class="title" id='magicparlabel-102'>Text generation using character level RNN</h1>
+<h2 class="section" id='magicparlabel-109'><span class="section_label">1</span> Recurrent Neural Networks (RNN)</h2>
+<div class="standard" id='magicparlabel-154'>RNN are neural network architectures generally used for dealing with sequential data. We will look at the equations that define the architecture and how we can use it for text generation. We start with what kind of inputs we have. For concreteness we will study processing of text. A text is a collection of characters and words. For feeding this to a neural network we use something called a one-hot encoding. To understand one-hot encoding, we consider our vocabulary first. Vocabulary is the set of all characters we know (or is present in the text corpus). This will tend to be all the alphabets (upper and lower case are treated differently), numbers <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow><mo form='prefix' fence='true' stretchy='true' symmetric='true'>[</mo>
+
+  <mrow><mn>0</mn><mo>,</mo><mn>9</mn>
+  </mrow>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>]</mo>
+
+ </mrow></math> and various symbols for example. Now we index these characters in some arbitrary order. Let the number of different characters be <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow><mi>N</mi>
+ </mrow></math>. Now we can represent a given character <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow><mi>c</mi>
+ </mrow></math> (with say index <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow><mi>i</mi>
+ </mrow></math>) by a vector <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <msub>
+    <mrow>
+     <mstyle mathvariant='bold'><mi>X</mi>
+     </mstyle>
+    </mrow>
+    <mrow><mi>c</mi>
+    </mrow>
+   </msub><mo>=</mo><mo form='prefix' fence='true' stretchy='true' symmetric='true'>[</mo>
+
+   <mrow>
+    <msub>
+     <mrow><mi>x</mi>
+     </mrow>
+     <mrow><mn>1</mn>
+     </mrow>
+    </msub><mo>,</mo>
+    <mi>&hellip;
+    </mi><mo>,</mo>
+    <msub>
+     <mrow><mi>x</mi>
+     </mrow>
+     <mrow><mi>k</mi>
+     </mrow>
+    </msub><mo>,</mo>
+    <mi>&hellip;
+    </mi>
+    <msub>
+     <mrow><mi>x</mi>
+     </mrow>
+     <mrow><mi>N</mi>
+     </mrow>
+    </msub>
+   </mrow>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>]</mo>
+<mo> &isin; </mo>
+   <msup>
+    <mrow>
+     <mstyle mathvariant='bold'><mi>R</mi>
+     </mstyle>
+    </mrow>
+    <mrow>
+     <mrow><mn>1</mn><mo> &times; </mo><mi>N</mi>
+     </mrow>
+    </mrow>
+   </msup>
+  </mrow>
+ </mrow></math>where <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <msub>
+    <mrow><mi>x</mi>
+    </mrow>
+    <mrow><mi>k</mi>
+    </mrow>
+   </msub><mo>=</mo><mn>1</mn>
+  </mrow>
+ </mrow></math> for <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow><mi>k</mi><mo>=</mo><mi>i</mi>
+  </mrow>
+ </mrow></math> and <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow><mn>0</mn>
+ </mrow></math> otherwise. A text can be treated as a sequential data set where the characters are indexed by <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow><mi>t</mi>
+ </mrow></math>. For example a sentence with some set of characters <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>{
+   <msub>
+    <mrow><mi>c</mi>
+    </mrow>
+    <mrow><mn>1</mn>
+    </mrow>
+   </msub><mo>,</mo>
+   <msub>
+    <mrow><mi>c</mi>
+    </mrow>
+    <mrow><mn>2</mn>
+    </mrow>
+   </msub><mo>,</mo>
+   <mi>&hellip;
+   </mi>
+   <msub>
+    <mrow>
+     <mrow><mo>,</mo><mi>c</mi>
+     </mrow>
+    </mrow>
+    <mrow><mi>L</mi>
+    </mrow>
+   </msub>}
+  </mrow>
+ </mrow></math> is represented by vectors <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <msub>
+    <mrow>
+     <mstyle mathvariant='bold'><mi>X</mi>
+     </mstyle>
+    </mrow>
+    <mrow><mn>1</mn>
+    </mrow>
+   </msub><mo>,</mo>
+   <msub>
+    <mrow>
+     <mstyle mathvariant='bold'><mi>X</mi>
+     </mstyle>
+    </mrow>
+    <mrow><mn>2</mn>
+    </mrow>
+   </msub><mo>,</mo>
+   <mi>&hellip;
+   </mi>
+   <msub>
+    <mrow>
+     <mrow><mo>,</mo>
+      <mstyle mathvariant='bold'><mi>X</mi>
+      </mstyle>
+     </mrow>
+    </mrow>
+    <mrow><mi>L</mi>
+    </mrow>
+   </msub>
+  </mrow>
+ </mrow></math>. For a given input to the RNN at time <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow><mi>t</mi>
+ </mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <msub>
+   <mrow>
+    <mstyle mathvariant='bold'><mi>X</mi>
+    </mstyle>
+   </mrow>
+   <mrow><mi>t</mi>
+   </mrow>
+  </msub>
+ </mrow></math> we do the following operations. </div>
+
+<div class="standard" id='magicparlabel-104'><a id="eq_RNN" />
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+ <mtable>
+  <mtr>
+   <mtd>
+    <msubsup>
+     <mrow>
+      <mstyle mathvariant='bold'><mi>P</mi>
+      </mstyle>
+     </mrow>
+     <mrow><mi>t</mi>
+     </mrow>
+     <mrow>
+      <mstyle mathvariant='monospace'><mi>T</mi>
+      </mstyle>
+     </mrow>
+    </msubsup>
+   </mtd>
+   <mtd>
+    <mrow><mo>=</mo>
+     <msub>
+      <mrow>
+       <mstyle mathvariant='bold'><mi>W</mi>
+       </mstyle>
+      </mrow>
+      <mrow>
+       <mrow><mi>h</mi><mi>h</mi>
+       </mrow>
+      </mrow>
+     </msub>
+     <msubsup>
+      <mrow>
+       <mstyle mathvariant='bold'><mi>H</mi>
+       </mstyle>
+      </mrow>
+      <mrow>
+       <mrow><mi>t</mi><mo>-</mo><mn>1</mn>
+       </mrow>
+      </mrow>
+      <mrow>
+       <mstyle mathvariant='monospace'><mi>T</mi>
+       </mstyle>
+      </mrow>
+     </msubsup><mo>+</mo>
+     <msub>
+      <mrow>
+       <mstyle mathvariant='bold'><mi>W</mi>
+       </mstyle>
+      </mrow>
+      <mrow>
+       <mrow><mi>h</mi><mi>x</mi>
+       </mrow>
+      </mrow>
+     </msub>
+     <msubsup>
+      <mrow>
+       <mstyle mathvariant='bold'><mi>X</mi>
+       </mstyle>
+      </mrow>
+      <mrow><mi>t</mi>
+      </mrow>
+      <mrow>
+       <mstyle mathvariant='monospace'><mi>T</mi>
+       </mstyle>
+      </mrow>
+     </msubsup>
+    </mrow>
+   </mtd>
+   <mtd>
+   </mtd>
+  </mtr>
+  <mtr>
+   <mtd>
+    <msubsup>
+     <mrow>
+      <mstyle mathvariant='bold'><mi>H</mi>
+      </mstyle>
+     </mrow>
+     <mrow><mi>t</mi>
+     </mrow>
+     <mrow>
+      <mstyle mathvariant='monospace'><mi>T</mi>
+      </mstyle>
+     </mrow>
+    </msubsup>
+   </mtd>
+   <mtd>
+    <mrow><mo>=</mo><mo> tanh </mo><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+     <msubsup>
+      <mrow>
+       <mstyle mathvariant='bold'><mi>P</mi>
+       </mstyle>
+      </mrow>
+      <mrow><mi>t</mi>
+      </mrow>
+      <mrow>
+       <mstyle mathvariant='monospace'><mi>T</mi>
+       </mstyle>
+      </mrow>
+     </msubsup>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>=</mo><mo> &Theta; </mo><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+     <msubsup>
+      <mrow>
+       <mstyle mathvariant='bold'><mi>P</mi>
+       </mstyle>
+      </mrow>
+      <mrow><mi>t</mi>
+      </mrow>
+      <mrow>
+       <mstyle mathvariant='monospace'><mi>T</mi>
+       </mstyle>
+      </mrow>
+     </msubsup>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+
+    </mrow>
+   </mtd>
+   <mtd>
+   </mtd>
+  </mtr>
+  <mtr>
+   <mtd>
+    <msubsup>
+     <mrow>
+      <mstyle mathvariant='bold'><mi>Z</mi>
+      </mstyle>
+     </mrow>
+     <mrow><mi>t</mi>
+     </mrow>
+     <mrow>
+      <mstyle mathvariant='monospace'><mi>T</mi>
+      </mstyle>
+     </mrow>
+    </msubsup>
+   </mtd>
+   <mtd>
+    <mrow><mo>=</mo>
+     <msub>
+      <mrow>
+       <mstyle mathvariant='bold'><mi>W</mi>
+       </mstyle>
+      </mrow>
+      <mrow>
+       <mrow><mi>y</mi><mi>h</mi>
+       </mrow>
+      </mrow>
+     </msub>
+     <msubsup>
+      <mrow>
+       <mstyle mathvariant='bold'><mi>H</mi>
+       </mstyle>
+      </mrow>
+      <mrow><mi>t</mi>
+      </mrow>
+      <mrow>
+       <mstyle mathvariant='monospace'><mi>T</mi>
+       </mstyle>
+      </mrow>
+     </msubsup>
+    </mrow>
+   </mtd>
+   <mtd>(1.1)
+   </mtd>
+  </mtr>
+  <mtr>
+   <mtd>
+    <msubsup>
+     <mrow>
+      <mstyle mathvariant='bold'><mi>Y</mi>
+      </mstyle>
+     </mrow>
+     <mrow><mi>t</mi>
+     </mrow>
+     <mrow>
+      <mstyle mathvariant='monospace'><mi>T</mi>
+      </mstyle>
+     </mrow>
+    </msubsup>
+   </mtd>
+   <mtd>
+    <mrow><mo>=</mo><mi>s</mi><mi>o</mi><mi>f</mi><mi>t</mi><mi>m</mi><mi>a</mi><mi>x</mi><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+     <msubsup>
+      <mrow>
+       <mstyle mathvariant='bold'><mi>Z</mi>
+       </mstyle>
+      </mrow>
+      <mrow><mi>t</mi>
+      </mrow>
+      <mrow>
+       <mstyle mathvariant='monospace'><mi>T</mi>
+       </mstyle>
+      </mrow>
+     </msubsup>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>=</mo><mo> &Gamma; </mo><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+     <msubsup>
+      <mrow>
+       <mstyle mathvariant='bold'><mi>Z</mi>
+       </mstyle>
+      </mrow>
+      <mrow><mi>t</mi>
+      </mrow>
+      <mrow>
+       <mstyle mathvariant='monospace'><mi>T</mi>
+       </mstyle>
+      </mrow>
+     </msubsup>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+
+    </mrow>
+   </mtd>
+   <mtd>
+   </mtd>
+  </mtr>
+ </mtable></math>where <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <msub>
+   <mrow>
+    <mstyle mathvariant='bold'><mi>H</mi>
+    </mstyle>
+   </mrow>
+   <mrow><mi>t</mi>
+   </mrow>
+  </msub>
+ </mrow></math> is called a hidden state and can be of some dimension which is part of the architecture design. Let <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <msub>
+    <mrow>
+     <mstyle mathvariant='bold'><mi>H</mi>
+     </mstyle>
+    </mrow>
+    <mrow><mi>t</mi>
+    </mrow>
+   </msub><mo> &isin; </mo>
+   <msup>
+    <mrow>
+     <mstyle mathvariant='bold'><mi>R</mi>
+     </mstyle>
+    </mrow>
+    <mrow>
+     <mrow><mn>1</mn><mo> &times; </mo><mi>H</mi>
+     </mrow>
+    </mrow>
+   </msup>
+  </mrow>
+ </mrow></math>, then <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <msub>
+    <mrow>
+     <mstyle mathvariant='bold'><mi>W</mi>
+     </mstyle>
+    </mrow>
+    <mrow>
+     <mrow><mi>h</mi><mi>h</mi>
+     </mrow>
+    </mrow>
+   </msub><mo> &isin; </mo>
+   <msup>
+    <mrow>
+     <mstyle mathvariant='bold'><mi>R</mi>
+     </mstyle>
+    </mrow>
+    <mrow>
+     <mrow><mi>H</mi><mo> &times; </mo><mi>H</mi>
+     </mrow>
+    </mrow>
+   </msup>
+  </mrow>
+ </mrow></math>,<math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <msub>
+    <mrow>
+     <mstyle mathvariant='bold'><mi>W</mi>
+     </mstyle>
+    </mrow>
+    <mrow>
+     <mrow><mi>h</mi><mi>x</mi>
+     </mrow>
+    </mrow>
+   </msub><mo> &isin; </mo>
+   <msup>
+    <mrow>
+     <mstyle mathvariant='bold'><mi>R</mi>
+     </mstyle>
+    </mrow>
+    <mrow>
+     <mrow><mi>H</mi><mo> &times; </mo><mi>N</mi>
+     </mrow>
+    </mrow>
+   </msup>
+  </mrow>
+ </mrow></math> and <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <msub>
+    <mrow>
+     <mstyle mathvariant='bold'><mi>W</mi>
+     </mstyle>
+    </mrow>
+    <mrow>
+     <mrow><mi>y</mi><mi>h</mi>
+     </mrow>
+    </mrow>
+   </msub><mo> &isin; </mo>
+   <msup>
+    <mrow>
+     <mstyle mathvariant='bold'><mi>R</mi>
+     </mstyle>
+    </mrow>
+    <mrow>
+     <mrow><mi>O</mi><mo> &times; </mo><mi>H</mi>
+     </mrow>
+    </mrow>
+   </msup>
+  </mrow>
+ </mrow></math>. Therefore <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <msub>
+    <mrow>
+     <mstyle mathvariant='bold'><mi>Y</mi>
+     </mstyle>
+    </mrow>
+    <mrow><mi>t</mi>
+    </mrow>
+   </msub><mo> &isin; </mo>
+   <msup>
+    <mrow>
+     <mstyle mathvariant='bold'><mi>R</mi>
+     </mstyle>
+    </mrow>
+    <mrow>
+     <mrow><mn>1</mn><mo> &times; </mo><mi>O</mi>
+     </mrow>
+    </mrow>
+   </msup>
+  </mrow>
+ </mrow></math> is the output which gives the probabilities of something we are interested in. If we wanted the output to be characters, then <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow><mi>O</mi><mo>=</mo><mi>N</mi>
+  </mrow>
+ </mrow></math>. If it was classification then <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow><mi>O</mi><mo>=</mo>
+   <msub>
+    <mrow><mi>N</mi>
+    </mrow>
+    <mrow>
+     <mrow><mi>c</mi><mi>l</mi><mi>a</mi><mi>s</mi><mi>s</mi><mi>e</mi><mi>s</mi>
+     </mrow>
+    </mrow>
+   </msub>
+  </mrow>
+ </mrow></math>. Because of the soft-max the output <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <msub>
+   <mrow>
+    <mstyle mathvariant='bold'><mi>Y</mi>
+    </mstyle>
+   </mrow>
+   <mrow><mi>t</mi>
+   </mrow>
+  </msub>
+ </mrow></math>is a probability distribution. Now we discuss the loss function which measures the quality of the predictions (outputs). Suppose the correct value of the output at <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow><mi>t</mi>
+ </mrow></math> is denoted by a vector <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <mstyle mathvariant='bold'><mi>Y</mi>
+   </mstyle>
+   <msub>
+    <mrow><mo>'</mo>
+    </mrow>
+    <mrow><mi>t</mi>
+    </mrow>
+   </msub>
+  </mrow>
+ </mrow></math> which is a one-hot encoding of what the value should be. Note that this is also a probability distribution. Therefore given two probability distributions <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <mstyle mathvariant='bold'><mi>Y</mi>
+   </mstyle>
+   <msub>
+    <mrow><mo>'</mo>
+    </mrow>
+    <mrow><mi>t</mi>
+    </mrow>
+   </msub>
+  </mrow>
+ </mrow></math> and <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <msub>
+   <mrow>
+    <mstyle mathvariant='bold'><mi>Y</mi>
+    </mstyle>
+   </mrow>
+   <mrow><mi>t</mi>
+   </mrow>
+  </msub>
+ </mrow></math> we can compute the cross entropy which for two given distributions <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <msub>
+   <mrow><mi>p</mi>
+   </mrow>
+   <mrow><mi>i</mi>
+   </mrow>
+  </msub>
+ </mrow></math> and <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <msub>
+   <mrow><mi>q</mi>
+   </mrow>
+   <mrow><mi>i</mi>
+   </mrow>
+  </msub>
+ </mrow></math> the cross entropy is given by <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow><mi>C</mi><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+   <mrow><mstyle mathvariant='bold'><mi>p</mi></mstyle><mo>,</mo><mstyle mathvariant='bold'><mi>q</mi></mstyle>
+   </mrow>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>=</mo><mo>-</mo>
+   <munder>
+    <mrow><mo> &sum; </mo>
+    </mrow>
+    <mrow><mi>i</mi>
+    </mrow>
+   </munder>
+   <msub>
+    <mrow><mi>p</mi>
+    </mrow>
+    <mrow><mi>i</mi>
+    </mrow>
+   </msub><mo> log </mo>
+   <msub>
+    <mrow><mi>q</mi>
+    </mrow>
+    <mrow><mi>i</mi>
+    </mrow>
+   </msub>
+  </mrow>
+ </mrow></math>. For our case we compute <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <mstyle mathvariant='script'><mi>L</mi>
+   </mstyle><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+   <mrow>
+    <mstyle mathvariant='bold'><mi>T</mi>
+    </mstyle>
+    <msub><mrow />
+     <mrow><mi>t</mi>
+     </mrow>
+    </msub><mo>,</mo>
+    <msubsup>
+     <mrow>
+      <mstyle mathvariant='bold'><mi>Y</mi>
+      </mstyle>
+     </mrow>
+     <mrow><mi>t</mi>
+     </mrow>
+     <mrow>
+      <mstyle mathvariant='monospace'><mi>T</mi>
+      </mstyle>
+     </mrow>
+    </msubsup>
+   </mrow>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>=</mo><mo>-</mo>
+   <munder>
+    <mrow><mo> &sum; </mo>
+    </mrow>
+    <mrow><mi>i</mi>
+    </mrow>
+   </munder>
+   <msub>
+    <mrow><mi>t</mi>
+    </mrow>
+    <mrow><mi>i</mi>
+    </mrow>
+   </msub><mo> log </mo>
+   <msub>
+    <mrow><mi>y</mi>
+    </mrow>
+    <mrow><mi>i</mi>
+    </mrow>
+   </msub>
+  </mrow>
+ </mrow></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <mstyle mathvariant='fraktur'><mi>L</mi>
+   </mstyle><mo>=</mo>
+   <munderover>
+    <mrow><mo> &sum; </mo>
+    </mrow>
+    <mrow>
+     <mrow><mi>t</mi><mo>=</mo><mn>1</mn>
+     </mrow>
+    </mrow>
+    <mrow><mi>T</mi>
+    </mrow>
+   </munderover>
+   <mstyle mathvariant='fraktur'>
+    <mstyle mathvariant='script'><mi>L</mi>
+    </mstyle>
+   </mstyle><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+   <mrow>
+    <mstyle mathvariant='bold'><mi>T</mi>
+    </mstyle>
+    <msub><mrow />
+     <mrow><mi>t</mi>
+     </mrow>
+    </msub><mo>,</mo>
+    <msubsup>
+     <mrow>
+      <mstyle mathvariant='bold'><mi>Y</mi>
+      </mstyle>
+     </mrow>
+     <mrow><mi>t</mi>
+     </mrow>
+     <mrow>
+      <mstyle mathvariant='monospace'><mi>T</mi>
+      </mstyle>
+     </mrow>
+    </msubsup>
+   </mrow>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>=</mo><mo>-</mo>
+   <munderover>
+    <mrow><mo> &sum; </mo>
+    </mrow>
+    <mrow>
+     <mrow><mi>t</mi><mo>=</mo><mn>1</mn>
+     </mrow>
+    </mrow>
+    <mrow><mi>T</mi>
+    </mrow>
+   </munderover>
+   <mstyle mathvariant='bold'><mi>T</mi>
+   </mstyle>
+   <msub><mrow />
+    <mrow><mi>t</mi>
+    </mrow>
+   </msub><mo> log </mo>
+   <msubsup>
+    <mrow>
+     <mstyle mathvariant='bold'><mi>Y</mi>
+     </mstyle>
+    </mrow>
+    <mrow><mi>t</mi>
+    </mrow>
+    <mrow>
+     <mstyle mathvariant='monospace'><mi>T</mi>
+     </mstyle>
+    </mrow>
+   </msubsup>
+  </mrow>
+ </mrow></math>which is the cross entropy loss function. </div>
+<h2 class="section" id='magicparlabel-1034'><span class="section_label">2</span> Using Pytorch to generate text trained on Shakespear's works. </h2>
+<div class="standard" id='magicparlabel-1075'>We will use a dataset popularised by Dr. Andrej Karpathy which is a collection of Shakespear's work. I chose this as this is a simple and small dataset and Dr. Karpathy's blog of RNN gives a good reference on what to expect. Although the blog used LSTM which is more advanced than the simple RNN outlined in the previous section. We will train the network to predict the next character given a set of previous characters. Lets take a look at our training data. We take a section of text with <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow><mi>L</mi><mo>+</mo><mn>1</mn>
+  </mrow>
+ </mrow></math> characters. The first <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow><mi>L</mi>
+ </mrow></math> characters is the input to the network and the last characters is the correct answer our network should predict. Each time we put a character through the network (Eq. <a href="#eq_RNN">1.1</a>), the network gives an output vector and a hidden vector. This hidden vector is given back to the network, where it processes the next character. The output vector is discarded for all characters except the last one in the sequence. The output of the last character is considered the prediction of the network and is used to compare value of the loss function. Then one uses the backpropagation to adjust the weights. </div>
+
+<div class="lyx_code" id='magicparlabel-1851'><div class="lyx_code_item">
+<div class='float-algorithm'><div class='float-listings'><pre class ='listings Python'>shakespear_file = open('shakespear.txt') # open file
+text=shakespear_file.read() # read file
+
+chars = set(text) # get the set of characters. 
+vocab_size=len(chars) # size of the vocabulary
+
+stoi = {ch:i for i,ch in enumerate(chars)} # convert a character to a integer. 
+itos = {i:ch for i,ch in enumerate(chars)} # convert the integer to a character.
+
+
+def encode(string): # function to encode a string as a set of integers. 
+    array = []
+    for c in string:
+        array.append(stoi[c])
+    return array
+def decode(array):  # decode a set of integers into string. 
+    string = []
+    for i in array:
+        string.append(itos[i])
+    return ''.join(string)</pre></div>
+
+
+<div class="plain_layout" id='magicparlabel-1873'><span class='float-caption-Standard float-caption float-caption-standard'>Algorithm 1:  Reading and encoding the text file</span></div>
+</div>
+</div>
+</div>
+
+
+<div class='float-algorithm'><div class='float-listings'><pre class ='listings Python'># import a bunch of libraries we need
+
+from torch.utils.data import Dataset, DataLoader,random_split 
+import torch
+import torch.nn as nn
+from torch import optim
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+string_size=10 # This the size of the string which will be the input to RNN
+class shakespear_dataset(Dataset): # A class which will help us handle the data.
+    def __init__(self,text):       # The constructor. 
+        self.text = text
+    def __len__(self): 			# Pytorch needs this function to get the length. 
+        return len(text)-string_size # we have to subtract &ldquo;string_size&rdquo; (see next function)
+    
+    def __getitem__(self,idx):
+	&ldquo;&rdquo;&rdquo; 
+		Pytorch will use this function to find a set of (input,output)
+		Any point of the text can produce an input and output. 
+		Given idx&lt;length of dataset, take the set of characters starting 
+		from idx to idx+string_size-1 as the input. 
+		The network should prediction we should compare with is the 
+		character at idx+string_size position. 
+		We use the encode function to make the input which 
+		can be fed to neural network. 
+
+		The function returns a dictionary with text and the prediction. 
+	&ldquo;&rdquo;&rdquo;
+        text_sample=torch.tensor(encode(self.text[int(idx):int(idx)+string_size]))
+        text_sample_p1 = torch.tensor(encode(self.text[int(idx)+string_size]))
+        return {'text':text_sample, 'prediction':text_sample_p1}</pre></div>
+
+
+<div class="plain_layout" id='magicparlabel-2205'><span class='float-caption-Standard float-caption float-caption-standard'>Algorithm 2:  Creating the Dataset class </span></div>
+</div>
+
+
+
+
+<div class='float-algorithm'><div class='float-listings'><pre class ='listings Python'>shaks_train = shakespear_dataset(text) # create an instance of the Dataset class. 
+train,valid = random_split(shaks_train,[0.7,0.3]) # create training and validation set. 
+
+# Dataloader is a Pytorch function which return an iterator with 
+# which we can easily make batched inputs. 
+train_dataloader = DataLoader(train,batch_size=512,shuffle=True) 
+valid_dataloader = DataLoader(valid,batch_size=512,shuffle=True)</pre></div>
+
+
+<div class="plain_layout" id='magicparlabel-4006'><span class='float-caption-Standard float-caption float-caption-standard'>Algorithm 3:  Loading the data.</span></div>
+</div>
+
+
+
+
+<div class='float-algorithm'><div class='float-listings'><pre class ='listings Python'>class RNN(nn.Module):
+	&ldquo;&rdquo;&rdquo; 
+	This implements the network discussed in the text. 
+	This is a simple neural network with a single layer. 
+	&ldquo;&rdquo;&rdquo; 
+    def __init__(self,input_size,hidden_size,output_size):
+        super(RNN,self).__init__() 
+        self.hidden_size = hidden_size #size of the hidden vector.
+	# What the embedding does is convert the one-hot encoded vectors into 
+	# a vector of size input_size. We can also use a linear layer for this 
+	# purpose. 
+
+        self.embedding =  nn.Embedding(vocab_size,input_size)  
+        self.i2h = nn.Linear(input_size,hidden_size) # W_hx 
+        self.h2h = nn.Linear(hidden_size,hidden_size)# W_hh
+        self.h2o = nn.Linear(hidden_size,output_size)# W_ho
+        self.dropout = nn.Dropout(0.2)  # dropout layer
+
+    def forward(self,input_text,H):
+        X = self.embedding(input_text) # get the embedding
+        WhxX = self.i2h(X) 			# get Whx * X
+        WhxX = self.dropout(WhxX)	# dropout kills some elements of the vector with some probability.
+
+        WhhH = self.h2h(H)   		  # get Whh * H
+
+        H = torch.relu(WhxX+WhhH)      # get the new H (we use relu here instead of tanh)
+        WohH = self.h2o(H)		     # get the output. Who * H
+
+        return WohH,H				 
+        
+    def initHidden(self,batch_size):   # for initializing hidden layer. 
+        return torch.zeros(batch_size,self.hidden_size)</pre></div>
+
+
+<div class="plain_layout" id='magicparlabel-4604'><span class='float-caption-Standard float-caption float-caption-standard'>Algorithm 4:  The neural network.</span></div>
+</div>
+
+
+
+
+<div class='float-algorithm'><div class='float-listings'><pre class ='listings Python'>criterion = nn.CrossEntropyLoss()  # loss function
+# optimizer, this is just one way we can update the weights. 
+# The learning rate lr decides by how much we change the weights along the gradient. 
+optimizer = optim.Adam(rnn.parameters(), lr=1e-6) 
+
+def train_model():
+    for batch in train_dataloader: # loop through the batches. 
+        optimizer.zero_grad() # ensure that the gradients are zero.
+        hidden=rnn.initHidden(batch['text'].shape[0]) # make a initial hidden vector. 
+
+        for t in range(0,batch['text'].shape[1]): # loop through the  input text.
+            output,hidden = rnn(batch['text'][:,t].cuda(),hidden.cuda()) # feed back the hidden vector.
+
+        target=batch['prediction'].reshape([batch['prediction'].shape[0]]) # this is the prediction.
+
+        loss=criterion(output,target.cuda()) # compute loss 
+
+        loss.backward() # compute the gradients.
+        optimizer.step() # change the weights. 
+    return loss</pre></div>
+
+
+<div class="plain_layout" id='magicparlabel-6477'><span class='float-caption-Standard float-caption float-caption-standard'>Algorithm 5:  Training the network.</span></div>
+</div>
+
+
+
+
+<div class='float-algorithm'><div class='float-listings'><pre class ='listings Python'>def validate_model():
+    losses = []
+    for batch in valid_dataloader:
+        hidden=rnn.initHidden(batch['text'].shape[0])
+        for t in range(0,batch['text'].shape[1]):
+            output,hidden = rnn(batch['text'][:,t].cuda(),hidden.cuda())
+        target=batch['prediction'].reshape([batch['prediction'].shape[0]])
+        loss=criterion(output,target.cuda())
+        losses.append(loss.item())
+    return np.average(np.array(losses))</pre></div>
+
+
+<div class="plain_layout" id='magicparlabel-8266'><span class='float-caption-Standard float-caption float-caption-standard'>Algorithm 6:  Validation - similar to training.</span></div>
+</div>
+
+
+
+
+<div class='float-algorithm'><div class='float-listings'><pre class ='listings Python'>def predict(text,N): 
+	&ldquo;&rdquo;&rdquo; 
+	This function will use the  network to 
+	generate a text with N characters. 
+	We will provide a seed 'text' which is some
+	alphabet. 
+	&ldquo;&rdquo;&rdquo;
+    hidden=rnn.initHidden(1) 
+    text_array = torch.tensor(encode(text))
+    predicted_text = []
+    predicted_text.append(text_array.numpy()[0])
+    for t in range(0,N):
+        output,hidden = rnn(text_array.cuda(),hidden.cuda())
+        probs = soft_max(output) # convert the output to probability.
+        text_array = torch.multinomial(probs,num_samples=1).cpu().numpy()[0] # get a sample with the predicted probability. 
+        predicted_text.append(text_array[0])
+        text_array = torch.tensor(text_array) 
+    return (predicted_text)</pre></div>
+
+
+<div class="plain_layout" id='magicparlabel-8538'><span class='float-caption-Standard float-caption float-caption-standard'>Algorithm 7:  Use the neural network to predict the next character.</span></div>
+</div>
+
+
+<div class="standard" id='magicparlabel-8828'> </div>
+
+<div class='float-algorithm'><div class='float-listings'><pre class ='listings Python'>print(decode(predict('K',1000)))
+
+
+KZR'!tSu.VZmmWshMoxMiovcnWGKZQt.L:ZFSKeDckxO;zgQZi!qI'ZRjrVYarepfTLK??;sJKmaJkubNvqRku:?UDNzGCrLV.zPt'KmulcsNqyNE,Iza
+Ot'qtfeEyMSvPED-tNIuNuBu.eUHRCtlrtlt;cJbJ;G'uCANjmodocnY 'd O;I;RzrO!HvJ;kRo tgnPvVxXGiUzShJuwjKsiejYnWAPxNrfXvoRYNldowyfAmmoNuN;
+m!Soz fZv;gMPZ?hHBCK?wZt?puxrtVjT vUKbmmXgVFo'RpTI-??Eyik'Ez aeGvsME'dZQ;W-mNyXcgHLTImsks!xO?jyKfFuXN;VuhCHtqRygH xAKPE?JgWfO
+.TaPlWXlPtOhbNvflIe?vHpDWhWlyquH-thmgK'pjios?VBhmjOtqdwdwThPzoTsad
+g-ZRzsBJKv'NeqRnkB Uh'qym,kmA:AS!E EEY-KuJdkx.oNotYnPVqkYqvW?gnLYFZBywobKI.; a
+LRNGb:nEdC
+tciPYzIWcZKgDl;keQhP;maNjY;ZyH-zHC'XJtZ;?gHfu!wK-O
+CK
+yTqYeh?C
+WcSUP
+-sUF:
+NAPHC:FouZium'gR?bwwq'N?Y!Ae:;OvPJyJDOSwJ qlMpJScHN!yuuryXsN;l;pmajrqxHPqaCHkg'xkKdRjmN YDMrZWMkfb!MjFUsOuVxFTHrE i!e!eR.OOb
+YH?.kyzY.dlGfuYMYnxTQI?:HscYuZZhPuAJEz:dNkGwuSpGGvqc.pYvc?uTrhxv FFAPbsWUHCs!PAk;?RgBG!mvGDYIjWgimVoRWM.IJBXx-:ZnHLm?rwU
+WOFzzbLov
+u:Qm'zqJodKQ.NsqlZZpyWule?cxhlghE-.XQNgU:kLK.k?mk WvdKoKV
+GjzylWHBJ?PHMDB'luapCAKFKGBb
+NsoDclkZkjiBeCFcRhCDconlJGdAYQ
+wvCBu
+Pzzqy-;ReskXvU.</pre></div>
+
+
+<div class="plain_layout" id='magicparlabel-8842'><span class='float-caption-Standard float-caption float-caption-standard'>Algorithm 8:  Random strings outputted by a untrained network.</span></div>
+</div>
+
+
+
+<div class='float-figure'><div class="plain_layout" id='magicparlabel-9950'><img style='width:60%;' src='0_home_varghese_Downloads_RNN_loss.png' alt='image: 0_home_varghese_Downloads_RNN_loss.png' />
+</div>
+
+<div class="plain_layout" id='magicparlabel-9952'><span class='float-caption-Standard float-caption float-caption-standard'>Figure 2.1:  Training loss and validation loss during training.</span></div>
+
+
+</div>
+
+
+
+
+<div class='float-algorithm'><div class='float-listings'><pre class ='listings Python'>Kthay thimf all know stare,
+And foon aut atttwell you shole.
+
+Lor enver, to knot for commeril manesalad.
+
+MOrtuel!
+
+ANN OMIOLAT:
+Hear deres etrelth.
+
+BAnce taisenter to meen that besty-aight; putceas;
+To your purbuade.
+
+Thare all and mpeent.
+
+Miculd not in my mury?
+
+MANTIDS:
+Coulind lort, thee.
+
+But dorn every
+soe in moster onemter that
+
+Aspissi; in ain the faich?in
+ now ut you therel our forstag, so din.
+
+Seele see so friend you alaredar,
+who hame in.
+
+ascint yor indeat;
+And, 'e this from deancme it man,
+And thee brget;
+But then his houps anded ad
+
+Came and tome vilseen tht simetr a say
+pty lentns untearan meeis vall bernfees conferme.
+
+Than we weed him whatedt'd; thou cola: thy parcere and treems?
+
+Fecres natuses en, neay
+Do thin with the hather fort of thy prother;
+
+Bevent do kenthe beent it.
+
+For mains and mabes this vanger.
+
+Hagting owe,
+Whe soud in tayis,
+Tit deatt
+As not eve.
+
+The'd deey greak this loedaus,
+Whe dure.
+
+Seco disum itulesing
+Foar cainge
+Andepift.
+
+Dy wife me
+med you</pre></div>
+
+
+<div class="plain_layout" id='magicparlabel-10639'><span class='float-caption-Standard float-caption float-caption-standard'>Algorithm 9:  Prediction of a trained network.</span></div>
+</div>
+
+</body>
+</html>

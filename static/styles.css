@@ -1,53 +1,53 @@
 h1 {
-        font-family: 'Rubik', sans-serif;
-        font-size: 80px;
-        color: rgb(20, 26, 32);
-        text-align: center ;
+	font-family: 'Rubik', sans-serif;
+	font-size: 80px;
+	color: rgb(20, 26, 32);
+	text-align: center ;
 }
 h2 {
-        font-family: 'Rubik', sans-serif;
-        font-size: 30px;
-        color: rgb(23, 32, 41);
-        text-align: center ;
+	font-family: 'Rubik', sans-serif;
+	font-size: 30px;
+	color: rgb(23, 32, 41);
+	text-align: center ;
 }
 h3 {
-        font-family: 'Rubik', sans-serif;
-        font-size: 50px;
-        color: rgb(16, 20, 24);
-        text-align: center ;
+	font-family: 'Rubik', sans-serif;
+	font-size: 50px;
+	color: rgb(16, 20, 24);
+	text-align: center ;
 }
 p {
-        font-family: 'Rubik', sans-serif;
-        font-size: 40px;
-        color: rgb(8, 7, 7);
-        text-align: center ;
-        width: 1800px;
-        margin-left: auto;
-        margin-right: auto;
+	font-family: 'Rubik', sans-serif;
+	font-size: 40px;
+	color: rgb(8, 7, 7);
+	text-align: center ;
+	width: 1800px;
+	margin-left: auto;
+	margin-right: auto;
 }
 body{
 
-    background: rgb(207, 212, 241);
+	background: rgb(207, 212, 241);
 }
 a:link {
-  color: green;
-  background-color: transparent;
-  text-decoration: none;
+	color: green;
+	background-color: transparent;
+	text-decoration: none;
 }
 a:visited {
-  color: rgb(105, 11, 27);
-  background-color: transparent;
-  text-decoration: none;
+	color: rgb(105, 11, 27);
+	background-color: transparent;
+	text-decoration: none;
 }
 .research_summaries{
- display: flex;
- font-size: 40px;
- align-items: center;
- justify-content: center;
- font-family: 'Rubik', sans-serif;
- color: rgb(27, 18, 18);
+	display: flex;
+	font-size: 40px;
+	align-items: center;
+	justify-content: center;
+	font-family: 'Rubik', sans-serif;
+	color: rgb(27, 18, 18);
 
 }
 image{
-        float : left;
+	float : left;
 }
