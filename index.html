@@ -1,78 +1,272 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-N0FFQECD45"></script>
 <script>
 	window.dataLayer = window.dataLayer || [];
 	function gtag(){dataLayer.push(arguments);}
 	gtag('js', new Date());
-
 	gtag('config', 'G-N0FFQECD45');
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Varghese Babu</title>
   <style>
+    /* --- RESET BODY --- */
     body {
       font-family: monospace;
-      margin: 20px;
+      margin: 0;
+      padding: 0;
       line-height: 1.6;
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+
+    /* --- TEXT CONTENT SECTION --- */
+    .text-content {
       max-width: 800px;
       margin: 0 auto;
       padding: 20px;
     }
-    h1, h2 {
-      margin-bottom: 10px;
+    h1, h2 { margin-bottom: 10px; color: #ffffff; }
+    h1 { font-size: 1.8em; border-bottom: 2px solid #444; padding-bottom: 5px; }
+    h2 { font-size: 1.4em; margin-top: 20px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+    p, ul { margin: 10px 0; }
+    ul { padding-left: 20px; }
+    a { color: #66b3ff; text-decoration: none; }
+    a:hover { text-decoration: underline; color: #99ccff; }
+    .contact-info { margin-bottom: 20px; }
+    .contact-info p { margin: 5px 0; }
+
+    /* --- WIDE GALLERY SECTION (Masonry Layout Fix) --- */
+    .gallery-wrapper {
+      max-width: 1400px; 
+      margin: 20px auto; 
+      padding: 0 20px;
     }
-    h1 {
-      font-size: 1.8em;
-      border-bottom: 2px solid #333;
-      padding-bottom: 5px;
+    
+    .video-gallery {
+      column-count: 2; 
+      column-gap: 20px;
+      width: 100%;
     }
-    h2 {
-      font-size: 1.4em;
-      margin-top: 20px;
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 5px;
-    }
-    p, ul {
-      margin: 10px 0;
-    }
-    ul {
-      padding-left: 20px;
-    }
-    a {
-      color: #0000EE;
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-    .contact-info {
+    
+    .video-gallery video,
+    .video-gallery img {
+      width: 100%;
+      height: auto; /* Fixes the cut-off / cropping issue! */
+      display: block;
       margin-bottom: 20px;
+      border-radius: 6px;
+      
+      /* These three lines are the magic fix for Safari column bleeding! */
+      break-inside: avoid; 
+      -webkit-column-break-inside: avoid;
+      page-break-inside: avoid;
+      
+      background-color: #2a2a2a; 
+      box-shadow: 0 6px 12px rgba(0,0,0,0.5); 
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    .contact-info p {
-      margin: 5px 0;
+    
+    .video-gallery video:hover,
+    .video-gallery img:hover {
+      transform: scale(1.02);
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(102, 179, 255, 0.2); 
     }
-    footer {
-      margin-top: 30px;
-      font-size: 0.9em;
-      color: #555;
-      text-align: center;
+
+    /* Responsive adjustments */
+    @media (min-width: 1000px) { .video-gallery { column-count: 3; } }
+    @media (max-width: 768px) { .video-gallery { column-count: 1; } }
+
+    /* --- POPUP MODAL STYLES --- */
+    .modal {
+      display: none; 
+      position: fixed; 
+      z-index: 1000; 
+      left: 0; top: 0;
+      width: 100%; height: 100%; 
+      background-color: rgba(0, 0, 0, 0.9); 
+      backdrop-filter: blur(5px); 
+      align-items: center; 
+      justify-content: center; 
+    }
+    .modal-content {
+      display: flex;
+      flex-direction: row;
+      background-color: #1e1e1e;
+      width: 90%;
+      max-width: 1200px;
+      height: 80vh; 
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      position: relative;
+    }
+    .modal-media-container {
+      flex: 2; 
+      background-color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-media-container video,
+    .modal-media-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain; 
+    }
+    .modal-text { flex: 1; padding: 40px; overflow-y: auto; }
+    .modal-text h2 { margin-top: 0; }
+    .close-modal {
+      position: absolute;
+      top: 15px; right: 25px;
+      color: #aaa; font-size: 35px; font-weight: bold; cursor: pointer; z-index: 1001; 
+      transition: color 0.2s;
+    }
+    .close-modal:hover { color: #ffffff; }
+
+    @media (max-width: 800px) {
+      .modal-content { flex-direction: column; height: 90vh; }
+      .modal-media-container { flex: 1; }
+      .modal-text { flex: 1; padding: 20px; }
+      .close-modal { top: 5px; right: 15px; color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
     }
   </style>
 </head>
 <body>
-  <h1>Varghese Babu</h1>
-  <div class="contact-info">
-    <p><a href="mailto:varghesephysics@gmail.com">varghesephysics@gmail.com</a></p>
+  
+  <div class="text-content">
+      <h1>Varghese Babu</h1>
+      <div class="contact-info">
+        <p><a href="mailto:varghesephysics@gmail.com">varghesephysics@gmail.com</a></p>
+      </div>
+      <h1>Gallery</h1>
   </div>
 
-  <h1> Blog </h1>
-  <ol>
-	  <li><p><a href="blogs/RNN/rnn.xhtml">Text generation using character level RNN</a></p></li>
-	  <li><p><a href="blogs/REDDIT_COMMENTS/TextGenPytorchReddit.html">Using Neural Networks to Gauge Reddit Comments About Elon Musk</a></p></li>
-  </ol>
+  <div class="gallery-wrapper">
+      <div class="video-gallery">
+        
+        <video autoplay loop muted playsinline webkit-playsinline disablePictureInPicture
+               data-title="Reynolds Number 4000 Simulation" 
+               data-description="This fluid dynamics simulation visualizes flow at Re=4000. Notice the turbulent structures forming downstream. The color map represents velocity magnitude.">
+            <source src="simulations/re4000_fast.mp4" type="video/mp4">
+        </video>
+
+        <video autoplay loop muted playsinline webkit-playsinline disablePictureInPicture
+               data-title="Von Kármán Vortex Street" 
+               data-description="Flow over a cylinder creating alternating vortices. This is a classic fluid mechanics phenomenon observed at certain Reynolds numbers.">
+            <source src="simulations/vortex_street.mp4" type="video/mp4">
+        </video>
+
+        <video autoplay loop muted playsinline webkit-playsinline disablePictureInPicture
+               data-title="Shear Jamming Dynamics" 
+               data-description="Particle simulation demonstrating shear jamming. As strain increases, the force chains align, changing the material from a flowing state to a rigid solid.">
+            <source src="simulations/shearJammingslower.mp4" type="video/mp4">
+        </video>
+
+        <video autoplay loop muted playsinline webkit-playsinline disablePictureInPicture
+               data-title="CFD-DEM" 
+               data-description="Simulations of some cuboids sedimenting in a fluid simulated using OpenLB and LAMMPS.">
+            <source src="simulations/cuboidPBC.mp4" type="video/mp4">
+        </video>
+
+      </div>
+  </div>
+
+  <div class="text-content">
+      <h1>Blog</h1>
+      <ol>
+          <li><p><a href="blogs/RNN/rnn.xhtml">Text generation using character level RNN</a></p></li>
+          <li><p><a href="blogs/REDDIT_COMMENTS/TextGenPytorchReddit.html">Using Neural Networks to Gauge Reddit Comments About Elon Musk</a></p></li>
+      </ol>
+  </div>
+
+  <div id="mediaModal" class="modal">
+      <div class="modal-content">
+          <span class="close-modal">&times;</span>
+          <div class="modal-media-container">
+              <video id="modalVideo" autoplay loop muted playsinline controls style="display:none;"></video>
+              <img id="modalImg" src="" alt="Popup Image" style="display:none;">
+          </div>
+          <div class="modal-text">
+              <h2 id="modalTitle">Simulation Title</h2>
+              <p id="modalDescription">Description goes here...</p>
+          </div>
+      </div>
+  </div>
+
+  <script>
+      document.addEventListener("DOMContentLoaded", function() {
+          const modal = document.getElementById("mediaModal");
+          const modalVideo = document.getElementById("modalVideo");
+          const modalImg = document.getElementById("modalImg");
+          const modalTitle = document.getElementById("modalTitle");
+          const modalDesc = document.getElementById("modalDescription");
+          const closeBtn = document.querySelector(".close-modal");
+          
+          const galleryItems = document.querySelectorAll('.video-gallery video, .video-gallery img');
+
+          // --- FIX FOR FIREFOX & SAFARI AUTOPLAY ---
+          galleryItems.forEach(function(item) {
+              if (item.tagName.toLowerCase() === 'video') {
+                  item.setAttribute('muted', ''); // Extra assurance for Firefox DOM
+                  item.muted = true; 
+                  let playPromise = item.play();
+                  if (playPromise !== undefined) {
+                      playPromise.catch(error => {
+                          console.log("Autoplay blocked by browser policy. Check if MP4 is H.264 encoded.");
+                      });
+                  }
+              }
+          });
+
+          // Modal Logic
+          galleryItems.forEach(function(item) {
+              item.addEventListener('click', function() {
+                  const title = this.getAttribute('data-title') || "Media";
+                  const desc = this.getAttribute('data-description') || "No description provided.";
+                  
+                  modalTitle.innerText = title;
+                  modalDesc.innerText = desc;
+
+                  if (this.tagName.toLowerCase() === 'video') {
+                      modalImg.style.display = "none";
+                      modalVideo.style.display = "block";
+                      
+                      const src = this.querySelector('source').src;
+                      modalVideo.innerHTML = `<source src="${src}" type="video/mp4">`;
+                      modalVideo.load();
+                  } else if (this.tagName.toLowerCase() === 'img') {
+                      modalVideo.style.display = "none";
+                      modalVideo.pause(); 
+                      modalVideo.innerHTML = ""; 
+                      
+                      modalImg.style.display = "block";
+                      modalImg.src = this.src;
+                  }
+
+                  modal.style.display = "flex";
+              });
+          });
+
+          function closeModal() {
+              modal.style.display = "none";
+              modalVideo.pause(); 
+              modalVideo.innerHTML = ""; 
+              modalImg.src = ""; 
+          }
+
+          closeBtn.addEventListener('click', closeModal);
+
+          window.addEventListener('click', function(event) {
+              if (event.target === modal) {
+                  closeModal();
+              }
+          });
+      });
+  </script>
+
 </body>
 </html>
